@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./VisualSort.css";
 import { mergeAnimations } from "../Algo/merge";
-import { bubbleAnimation } from "../Algo/bubble";
+import { getbubbleSortAnimations } from "../Algo/bubble";
+import {
+  getquickAnimations,
+  doQuickSort,
+  quickSortPartition,
+} from "../Algo/quickSort";
+import { getInsertionSortAnimations } from "../Algo/insertion";
 
 const VisualSort = () => {
   const [array, setarray] = useState([]);
@@ -48,34 +54,100 @@ const VisualSort = () => {
   };
 
   const bubbleSort = () => {
-    const animations = bubbleAnimation(array);
-    let arrayBars = document.getElementsByClassName("array-bar");
+    const animations = getbubbleSortAnimations(array);
+    //console.log(animations);
+    for (let i = 0; i < animations.length; i++) {
+      const isColorChange = i % 4 === 0 || i % 4 === 1;
+      const arrayBars = document.getElementsByClassName("array-bar");
+      if (isColorChange) {
+        console.log(animations[i]);
+        const color = i % 4 === 0 ? SECONDARY_COLOR : PRIMARY_COLOR;
+        const [barOneIndex, barTwoIndex] = animations[i];
+        const barOneStyle = arrayBars[barOneIndex].style;
+        const barTwoStyle = arrayBars[barTwoIndex].style;
+        setTimeout(() => {
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
+        }, i * TIME_MS);
+      } else {
+        const [barIndex, newHeight] = animations[i];
+        if (barIndex === -1) {
+          continue;
+        }
+        const barStyle = arrayBars[barIndex].style;
+        setTimeout(() => {
+          barStyle.height = `${newHeight}px`;
+        }, i * TIME_MS);
+      }
+    }
+  };
+
+  const quickSort = () => {
+    const animations = getquickAnimations(array);
+    const arrayBars = document.getElementsByClassName("array-bar");
+
     for (let i = 0; i < animations.length; i++) {
       setTimeout(() => {
-        const [barOneIdx, barTwoIdx] = animations[i];
-
+        let [barOneIdx, barTwoIdx] = animations[i];
+        let tempAimations = [];
+        let index;
         const barOneStyle = arrayBars[barOneIdx].style;
         const barTwoStyle = arrayBars[barTwoIdx].style;
 
-        let temp = array[barOneIdx];
-        array[barOneIdx] = array[barTwoIdx];
-        array[barTwoIdx] = temp;
+        if (array.length > 1) {
+          index = quickSortPartition(array, 0, array.length - 1, tempAimations); //index returned from partition
+          if (0 < index - 1) {
+            //more elements on the left side of the pivot
+            doQuickSort(tempAimations, array, 0, index - 1);
+          }
+          if (index < array.length) {
+            //more elements on the right side of the pivot
+            doQuickSort(tempAimations, array, 0, array.length - 1);
+          }
+        }
 
         barOneStyle.height = `${array[barOneIdx]}px`;
         barTwoStyle.height = `${array[barTwoIdx]}px`;
 
-        barOneStyle.backgroundColor = "red";
-        barTwoStyle.backgroundColor = "green";
+        barOneStyle.backgroundColor = "green";
+        barTwoStyle.backgroundColor = "red";
 
         let currentPosition = barOneIdx;
         for (let j = 0; j < currentPosition; j++) {
           let jBarStyle = arrayBars[j].style;
-          jBarStyle.backgroundColor = "blue";
+          jBarStyle.backgroundColor = "green";
         }
         if (i === animations.length - 1) {
           makeAllBarsGreen();
         }
-      }, i * TIME_MS);
+      }, 0.0001);
+    }
+  };
+
+  const insertionSort = () => {
+    const [animations] = getInsertionSortAnimations(array);
+    for (let i = 0; i < animations.length; i++) {
+      const isColorChange =
+        animations[i][0] === "comparision1" ||
+        animations[i][0] === "comparision2";
+      const arrayBars = document.getElementsByClassName("array-bar");
+      if (isColorChange) {
+        const color =
+          animations[i][0] === "comparision1" ? SECONDARY_COLOR : PRIMARY_COLOR;
+        const [temp, barOneIndex, barTwoIndex] = animations[i];
+        const barOneStyle = arrayBars[barOneIndex].style;
+        const barTwoStyle = arrayBars[barTwoIndex].style;
+        setTimeout(() => {
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
+        }, i * TIME_MS);
+      } else {
+        const [temp, barIndex, newHeight] = animations[i];
+        const barStyle = arrayBars[barIndex].style;
+        setTimeout(() => {
+          barStyle.height = `${newHeight}px`;
+        }, i * TIME_MS);
+      }
     }
   };
 
@@ -105,6 +177,8 @@ const VisualSort = () => {
       <button onClick={resetArray}>Random array</button>
       <button onClick={mergeSort}>Merge Sort</button>
       <button onClick={bubbleSort}>Bubble sort</button>
+      <button onClick={quickSort}>Quick Sort</button>
+      <button onClick={insertionSort}>Insertion Sort</button>
     </div>
   );
 };

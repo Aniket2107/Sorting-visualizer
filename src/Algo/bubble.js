@@ -1,24 +1,31 @@
-export const bubbleAnimation = (array) => {
-  const animations = [];
+export function getbubbleSortAnimations(array) {
+  let animations = [];
   if (array.length <= 1) return array;
-  let tempArray = array.slice();
-  doBubbleSort(animations, tempArray);
-
+  let auxiliaryArray = array.slice();
+  bubbleSort(auxiliaryArray, animations);
   return animations;
-};
+}
 
-const doBubbleSort = (animations, tempArray) => {
-  let swapped;
-  do {
-    swapped = false;
-    for (let i = 0; i < tempArray.length - 1; i++) {
-      if (tempArray[i] > tempArray[i + 1]) {
-        let temp = tempArray[i];
-        tempArray[i] = tempArray[i + 1];
-        tempArray[i + 1] = temp;
-        animations.push([i, i + 1]);
-        swapped = true;
+function bubbleSort(auxiliaryArray, animations) {
+  const n = auxiliaryArray.length;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - 1; j++) {
+      animations.push([j, j + 1]);
+      animations.push((j, j + 1));
+      if (auxiliaryArray[j] > auxiliaryArray[j + 1]) {
+        animations.push([j, auxiliaryArray[j + 1]]);
+        animations.push([j + 1, auxiliaryArray[j]]);
+        swap(auxiliaryArray, j, j + 1);
+      } else {
+        animations.push([-1, -1]);
+        animations.push([-1, -1]);
       }
     }
-  } while (swapped);
-};
+  }
+}
+
+function swap(auxiliaryArray, firstIndex, secondIndex) {
+  let temp = auxiliaryArray[firstIndex];
+  auxiliaryArray[firstIndex] = auxiliaryArray[secondIndex];
+  auxiliaryArray[secondIndex] = temp;
+}
