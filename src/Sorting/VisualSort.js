@@ -120,7 +120,7 @@ const VisualSort = () => {
         if (i === animations.length - 1) {
           makeAllBarsGreen();
         }
-      }, 0.0001);
+      }, i*TIME_MS);
     }
   };
 
